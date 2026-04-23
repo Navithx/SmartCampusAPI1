@@ -1,14 +1,14 @@
 Overview
 
-The **SmartCampus API** is a RESTful web service designed to manage smart campus resources such as rooms, sensors, and sensor readings.
+The SmartCampus API is a RESTful web service designed to manage smart campus resources such as rooms, sensors, and sensor readings.
 
 Key Features
 
-Manage **Rooms**
-Manage **Sensors** assigned to rooms
-Store and retrieve **Sensor Readings**
-Proper **error handling** using exception mappers
-**Logging filter** for request/response tracking
+Manage Rooms
+Manage Sensors assigned to rooms
+Store and retrieve Sensor Readings
+Proper error handling using exception mappers
+Logging filter for request/response tracking
 
 API Design
 
@@ -22,6 +22,7 @@ Organized into resources:
   * `/rooms`
   * `/sensors`
   * `/readings`
+
 
 How to Build and Run the Project
 
@@ -96,6 +97,7 @@ curl -X POST http://localhost:8080/api/readings \
 ```bash
 curl -X GET http://localhost:8080/api/readings?sensorId=1
 ```
+
 
 Error Handling
 
