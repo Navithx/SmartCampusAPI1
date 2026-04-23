@@ -1,46 +1,48 @@
-Overview
+ 
+SmartCampus API
 
-The SmartCampus API is a RESTful web service designed to manage smart campus resources such as rooms, sensors, and sensor readings.
+ Overview
 
-Key Features
+The SmartCampus API is a RESTful web service developed to manage smart campus resources including rooms, sensors, and sensor readings. It supports full CRUD operations, validation, filtering, nested resources, and robust error handling.
 
-Manage Rooms
-Manage Sensors assigned to rooms
-Store and retrieve Sensor Readings
-Proper error handling using exception mappers
-Logging filter for request/response tracking
+ 
 
-API Design
+  API Design
 
-The API follows REST principles:
+The API follows RESTful principles:
 
-Uses standard HTTP methods (`GET`, `POST`, `PUT`, `DELETE`)
-Returns appropriate HTTP status codes (200, 201, 404, 409, etc.)
-JSON is used for request and response bodies
-Organized into resources:
+- Uses HTTP methods: GET, POST, DELETE
+- Returns appropriate HTTP status codes (200, 201, 404, 409, 422, 500)
+- JSON is used for request and response bodies
+- Versioned base path:  
+  `/api/v1`
 
-  * `/rooms`
-  * `/sensors`
-  * `/readings`
+  Main Resources
 
+- `/api/v1` → Discovery endpoint  
+- `/api/v1/rooms` → Room management  
+- `/api/v1/sensors` → Sensor management  
+- `/api/v1/sensors/{id}/readings` → Sensor readings  
 
-How to Build and Run the Project
+ 
 
-Prerequisites
+ How to Build and Run the Project
 
-Make sure you have installed:
+ Prerequisites
 
-Java JDK 17+
-Maven
+- Java JDK 17+
+- Maven
+- Apache Tomcat (installed and running)
 
-Step-by-Step Instructions
+ 
+ Step-by-Step Instructions
 
 1. Clone the repository
 
 ```bash
 git clone https://github.com/Navithx/SmartCampusAPI1.git
 cd SmartCampusAPI1
-```
+````
 
 2. Build the project
 
@@ -48,241 +50,167 @@ cd SmartCampusAPI1
 mvn clean install
 ```
 
-3. Run the application
+3. Deploy to Tomcat
 
-```bash
-java -jar target/SmartCampusAPI1-1.0-SNAPSHOT.jar
+* Copy the generated `.war` file from:
+
+```
+target/SmartCampusAPI1-1.0-SNAPSHOT.war
 ```
 
-4. Server will start at:
+* Paste it into:
 
-```bash
-http://localhost:8080/api
+```
+Tomcat/webapps/
 ```
 
- Sample cURL Commands
+4. Start Tomcat server
 
-1. Create a Room
+5. Open in browser:
 
-```bash
-curl -X POST http://localhost:8080/api/rooms \
--H "Content-Type: application/json" \
--d '{"name": "Lab A", "capacity": 30}'
 ```
-
-2. Get All Rooms
-
-```bash
-curl -X GET http://localhost:8080/api/rooms
+http://localhost:8080/SmartCampusAPI1/api/v1/
 ```
-
-3. Create a Sensor
-
-```bash
-curl -X POST http://localhost:8080/api/sensors \
--H "Content-Type: application/json" \
--d '{"type": "Temperature", "roomId": 1}'
-```
-
-4. Add a Sensor Reading
-
-```bash
-curl -X POST http://localhost:8080/api/readings \
--H "Content-Type: application/json" \
--d '{"sensorId": 1, "value": 25.5}'
-```
-
-5. Get Sensor Readings
-
-```bash
-curl -X GET http://localhost:8080/api/readings?sensorId=1
-```
-
-
-Error Handling
-
-The API includes:
-
-Custom exception mappers (e.g., `NotFoundMapper`, `GenericExceptionMapper`)
-Proper HTTP responses:
-
-   `404 Not Found`
-   `409 Conflict`
-   `500 Internal Server Error`
-
-Logging
-
-A logging filter is implemented to:
-
- Log incoming requests
- Log outgoing responses
- Improve debugging and observability
-
-
- Conceptual Answers
-
-PART 1: Service Architecture and Setup 
- 
-1.    Project & Application Configuration
-
-In JAX-RS a resource class is created fresh for each HTTP request. This means a new instance of the class is made every time a request comes in.
-This design helps with two things:
-·      It makes sure the class is thread-safe by default.
-·      It ensures that there is no shared data that can be changed inside the class.
-However, in this coursework we use in-memory data structures like HashMap and ArrayList to store data. These structures are usually defined in one shared class, like DataStore. Act like a single instance used throughout the application.
-Since many requests can access these shared structures at the time:
-·      There is a risk of things getting messed up because of timing issues.
-·      The data might become inconsistent.
-To handle this:
-·      We put all the data in one place.
-·      We are careful to avoid making changes to the data in a way.
-·      In a production system we would need to use special tools, like synchronization or special collections that are safe for many threads to use at the same time like ConcurrentHashMap.
- 
-2.     Discovery Endpoint
-
-Hypermedia, which is also known as HATEOAS or Hypermedia As The Engine Of Application State is a way for APIs to include links in the information they send back to clients. These links tell the clients what they can do next.
-This means that clients do not have to follow a set of rules that never change. They can look at the links in the information they get from the API. Figure out what to do.
-The good things about Hypermedia are:
-·      It reduces the need for documentation that the client has to look at to know what to do.
-·      It makes it easier for clients to find out what the API can do.
-·      It makes the API more flexible and able to change over time.
-·      It lets clients change automatically when the API changes.
- 
-
-
-Part 2: Room Management
- 
-1.    Room Resource Implementation 
- 
-Returning IDs or full objects has pros and cons:
- 
-·      Returning IDs:
-o   The response size is smaller.
-o   It uses network bandwidth.
-o   The client needs to make extra requests.
- 
-·      Returning objects:
-o   There is data, in one response.
-o   It reduces the number of API calls.
-o   It uses a bit bandwidth.
- 
-In this implementation we return objects. This is because it makes it easier for the client to process the data and reduces the number of requests they need to make.
-
-      
-2.    Room Deletion and Safety Logic
- 
-In this implementation, the DELETE operation is idempotent.
- 
-This means: 
-·      If you delete a room successfully once, any further DELETE requests for that room will not change the system state any more.
-What to do:
-·      First, DELETE → the room is deleted → returns success.
-·      Second DELETE: The room is no longer exists, and a 404 error is returned.  
-Even though the system gives you messages the important thing is that the system does not change after the first time you delete the room, which is what we want to happen.
-Also, deletion is blocked if the room has sensors, which keeps the data safe.
- 
- 
-Part 3: Sensor Operations & Linking
- 
-1.    Sensor Resource & Integrity
- 
-The @Consumes(MediaType.The APPLICATION_JSON annotation makes sure that the API only accepts JSON data.
- 
-If a customer sends:
-·      text/plain 
-·      application/xml 
- 
-JAX-RS will reject the request. It will return HTTP 415 which means Unsupported Media Type.
-This ensures that the data format is consistent. It also ensures that the data is parsed and validated properly.
- 
-2.    Filtered Retrieval & Search
- 
-Using @QueryParam to filter:
-·      /api/v1/sensors?type=CO2
-Is better than:
-·      /api/v1/sensors/type/CO2
-Because: 
-·      Query parameters help you filter and search.
-·      They can be changed and are not required.
-·      It's easy to combine more than one filter.
-For example:
-·      /api/v1/sensors?type=CO2&status=ACTIVE
-Path parameters are better for finding specific resources than for filtering collections.
- 
- 
- 
-Part 4: Deep Nesting with Sub-Resources
- 
-1.    Sub-Resource Locator Pattern
- 
-The Sub-Resource Locator pattern lets you give different classes the job of handling nested resource logic.
- 
-Advantages:
-·      Makes code easier to find
-·      Lessens the complexity of main resource classes
-·      Makes it easier to read and maintain
-·      Helps large APIs grow without problems
- 
-Instead of one big class doing everything, the work is divided up:
-·      SensorResource → handles with sensors
-·      SensorReadingResource → handles the readings.
- 
- 
- 
-
-Part 5: Advanced Error Handling, Exception Mapping & Logging
- 
-1.    Dependency Validation (422 Unprocessable Entity)
-
-HTTP 422 is more semantically correct than 404 because the request itself is syntactically correct, but the data in the payload is not valid.  In this case:
-·      The JSON structure is correct.
-·      The endpoint is there
-·      But there is no resource that is mentioned (like roomId)
-A 404 means that the requested endpoint or resource can't be found,
-while a 422 means that:
-·      The server gets the request
-·      But it can't process it because the data is wrong or doesn't match.
-So, 422 is a better way to show that a valid request failed validation than that an endpoint is missing. 
 
  
-2.    Global Safety Net (500)
- 
-Exposing internal Java stack traces is a security risk because it shows
-private information about how the system works.
- 
-An attacker can collect data such as:
-·      Names of classes and packages inside
-·      Paths to files and directory structures
-·      Frameworks and libraries that are being used
-·      Names of methods and the flow of application logic
- 
-This information can be used to do things like:
-·      Find known weaknesses in certain libraries
-·      Do targeted attacks, like injection attacks.
-·      Understand how the system is built so they can try to exploit it
- 
-The system lowers the chance of information leaks and makes the whole system safer by hiding stack traces and giving generic error messages.
- 
- 
- 
-3.    API Request & Response Logging Filters
- 
-Using JAX-RS filters for logging is helpful because it keeps logging logic in one place and stops resource methods from repeating themselves.
- 
-Some of the benefits are:
-·      Separation of concerns means that logging is done separately from
-·      business logic.
-·      Less code duplication: You don't have to add logging statements to every
-·      method.
-·      Consistency: All requests and responses are logged in the same way.
-·      Easier to keep up with: You can change how logging works in one place.
- 
-Adding Logger.info() by hand to each resource method, on the other hand,
-makes the code more repetitive, harder to maintain, and more likely to log
-inconsistently.
 
-  My long-term goal is to become a Cyber Security Engineer, focusing on protecting systems, networks, and data from cyber threats. With the rapid growth of digital technology, I am motivated to contribute to securing digital infrastructures.
+  Sample cURL Commands
 
-This course will give me a strong foundation in computing and essential cybersecurity skills such as network security, system architecture, and risk management. It will also help me develop practical experience in identifying vulnerabilities and implementing security solutions.
+ 1. Discovery Endpoint
 
-By completing this program, I aim to gain the technical expertise and problem-solving skills needed to succeed in the cybersecurity field and contribute effectively to the industry.
+```bash
+curl -X GET http://localhost:8080/SmartCampusAPI1/api/v1/
+```
+
+ 
+
+  2. Create a Room
+
+```bash
+curl -X POST http://localhost:8080/SmartCampusAPI1/api/v1/rooms \
+-H "Content-Type: application/json" \
+-d '{"id":"R1","name":"Lab 1"}'
+```
+
+ 
+
+ 3. Get All Rooms
+
+```bash
+curl -X GET http://localhost:8080/SmartCampusAPI1/api/v1/rooms
+```
+
+ 
+
+  4. Create a Sensor
+
+```bash
+curl -X POST http://localhost:8080/SmartCampusAPI1/api/v1/sensors \
+-H "Content-Type: application/json" \
+-d '{"id":"TEMP-001","type":"TEMPERATURE","roomId":"R1"}'
+```
+
+ 
+
+  5. Add Sensor Reading
+
+```bash
+curl -X POST http://localhost:8080/SmartCampusAPI1/api/v1/sensors/TEMP-001/readings \
+-H "Content-Type: application/json" \
+-d '{"id":"r1","timestamp":1710000000,"value":26.5}'
+```
+
+ 
+
+  6. Filter Sensors by Type
+
+```bash
+curl -X GET "http://localhost:8080/SmartCampusAPI1/api/v1/sensors?type=TEMPERATURE"
+```
+
+ 
+
+ Error Handling
+
+The API uses custom exception mappers to ensure no internal errors are exposed:
+
+* 404 → Resource not found
+* 409 → Room has active sensors
+* 422 → Invalid linked resource
+* 403 → Sensor unavailable
+* 500 → Internal server error
+
+ 
+
+ Logging
+
+A logging filter is implemented using JAX-RS:
+
+* Logs every incoming request (method + URI)
+* Logs every outgoing response (status code)
+* Improves debugging and observability
+
+ 
+ Conceptual Answers
+
+ Part 1: Service Architecture & Setup
+
+In JAX-RS, resource classes are created per request by default. This means a new instance of the resource class is instantiated for every incoming HTTP request. This approach improves thread safety because no instance variables are shared across requests.
+
+However, the application uses shared in-memory data structures such as HashMaps and ArrayLists stored in a central DataStore. Since multiple requests can access these shared structures simultaneously, there is a risk of race conditions and data inconsistency.
+
+To manage this, data is centralized and controlled carefully. In a production system, thread-safe collections such as ConcurrentHashMap or synchronization mechanisms would be used to ensure safe concurrent access.
+
+ 
+
+Hypermedia (HATEOAS) allows APIs to include links within responses that guide clients on what actions are available next. Instead of relying on static documentation, clients dynamically discover API capabilities.
+
+This improves flexibility, reduces dependency on hardcoded endpoints, and allows the API to evolve without breaking clients. It also makes the system more self-descriptive and easier for developers to use.
+
+ 
+
+ Part 2: Room Management
+
+Returning only IDs reduces response size and improves network efficiency but requires additional API calls from the client to fetch full details.
+
+Returning full objects increases response size but reduces the number of requests needed and simplifies client-side processing. In this implementation, full objects are returned to improve usability and reduce client complexity.
+
+ 
+
+The DELETE operation is idempotent. When a room is deleted successfully, repeating the same DELETE request will not change the system further. The first request deletes the resource, and subsequent requests return a 404 since the resource no longer exists. The system state remains unchanged after the first deletion.
+
+ 
+
+ Part 3: Sensor Operations & Linking
+
+The @Consumes(MediaType.APPLICATION_JSON) annotation ensures that only JSON input is accepted. If a client sends data in another format such as text/plain or application/xml, JAX-RS will reject the request with HTTP 415 (Unsupported Media Type). This guarantees consistent data handling and proper validation.
+
+ 
+
+Using @QueryParam for filtering is more flexible than using path parameters. Query parameters allow optional filtering, support multiple conditions, and are better suited for searching collections.
+
+Path parameters are intended for identifying specific resources, while query parameters are ideal for filtering and querying datasets.
+
+ 
+
+ Part 4: Deep Nesting with Sub-Resources
+
+The Sub-Resource Locator pattern improves code organization by delegating nested resource logic to separate classes. Instead of handling everything in one large controller, responsibilities are divided.
+
+This makes the code easier to maintain, improves readability, and allows the API to scale more effectively. It also promotes separation of concerns by isolating different functionalities into dedicated classes.
+
+ 
+
+  Part 5: Advanced Error Handling
+
+HTTP 422 is more appropriate than 404 when the request is valid but contains incorrect data. The server understands the request structure, but the referenced resource inside the payload does not exist. This makes 422 more semantically accurate than 404.
+
+ 
+ 
+Exposing internal stack traces is a security risk because it reveals sensitive implementation details such as class names, file paths, frameworks, and method flows. Attackers can use this information to identify vulnerabilities and launch targeted attacks. Hiding stack traces prevents information leakage and strengthens security.
+
+ 
+
+Using JAX-RS filters for logging centralizes logging logic and avoids code duplication. It ensures consistent logging across all endpoints and separates logging from business logic. This makes the application cleaner, easier to maintain, and more scalable compared to manually inserting logging statements in every method.
+
+ 
