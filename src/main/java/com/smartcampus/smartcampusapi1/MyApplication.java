@@ -5,8 +5,16 @@
 package com.smartcampus.smartcampusapi1;
 
 import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import org.glassfish.jersey.server.ResourceConfig;
 
 @ApplicationPath("/api/v1")
-public class MyApplication extends Application {
+public class MyApplication extends ResourceConfig {
+
+    public MyApplication() {
+        packages(
+            "com.smartcampus.resource",
+            "com.smartcampus.exception",
+            "com.smartcampus.filter"
+        );
+    }
 }
