@@ -5,6 +5,7 @@
 /Users/macbook/Desktop/SmartCampusAPI1/src/main/java/com/smartcampus/model/Sensor.java
 /Users/macbook/Desktop/SmartCampusAPI1/src/main/java/com/smartcampus/model/SensorReading.java
 /Users/macbook/Desktop/SmartCampusAPI1/src/main/java/com/smartcampus/resource/RoomResource.java
+/Users/macbook/Desktop/SmartCampusAPI1/src/main/java/com/smartcampus/resource/RootResource.java
 /Users/macbook/Desktop/SmartCampusAPI1/src/main/java/com/smartcampus/resource/SensorReadingResource.java
 /Users/macbook/Desktop/SmartCampusAPI1/src/main/java/com/smartcampus/resource/SensorResource.java
 /Users/macbook/Desktop/SmartCampusAPI1/src/main/java/com/smartcampus/smartcampusapi1/Main.java

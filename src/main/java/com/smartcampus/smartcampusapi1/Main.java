@@ -15,9 +15,9 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // This scans your resource package automatically
+        
         ResourceConfig config = new ResourceConfig()
-                .packages("com.smartcampus.resource","com.smartcampus.exception"," com.smartcampus.filter");
+                .packages("com.smartcampus.resource","com.smartcampus.exception","com.smartcampus.filter");
 
         HttpServer server = GrizzlyHttpServerFactory.createHttpServer(
                 URI.create(BASE_URI),

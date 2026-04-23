@@ -16,27 +16,27 @@ import java.util.*;
 @Consumes(MediaType.APPLICATION_JSON)
 public class RoomResource {
 
-    // GET all rooms
+     
     @GET
     public Collection<Room> getRooms() {
         return DataStore.rooms.values();
     }
 
-    // POST create room
+     
     @POST
     public Response createRoom(Room room) {
         DataStore.rooms.put(room.getId(), room);
         return Response.status(Response.Status.CREATED).entity(room).build();
     }
 
-    // GET single room
+     
     @GET
     @Path("/{id}")
     public Room getRoom(@PathParam("id") String id) {
         return DataStore.rooms.get(id);
     }
 
-    // DELETE room
+     
     @DELETE
     @Path("/{id}")
     public Response deleteRoom(@PathParam("id") String id) {

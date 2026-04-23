@@ -16,7 +16,7 @@ import java.util.*;
 @Consumes(MediaType.APPLICATION_JSON)
 public class SensorResource {
 
-    // GET all sensors (with filtering)
+     
     @GET
     public Collection<Sensor> getSensors(@QueryParam("type") String type) {
 
@@ -35,11 +35,11 @@ public class SensorResource {
         return filtered;
     }
 
-    // POST sensor (IMPORTANT VALIDATION)
+    
     @POST
     public Response addSensor(Sensor sensor) {
 
-        // 🔥 VALIDATION: check room exists
+         
         if (!DataStore.rooms.containsKey(sensor.getRoomId())) {
             return Response.status(422)
                     .entity("{\"error\":\"Room does not exist\"}")
@@ -48,7 +48,7 @@ public class SensorResource {
 
         DataStore.sensors.put(sensor.getId(), sensor);
 
-        // 🔗 LINK sensor to room
+         
         DataStore.rooms.get(sensor.getRoomId())
                 .getSensorIds()
                 .add(sensor.getId());

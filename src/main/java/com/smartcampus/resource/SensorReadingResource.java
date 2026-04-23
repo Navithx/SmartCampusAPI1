@@ -23,11 +23,11 @@ public class SensorReadingResource {
     @POST
     public SensorReading addReading(@PathParam("id") String sensorId, SensorReading reading) {
 
-        // create list if not exists
+        
         DataStore.readings.putIfAbsent(sensorId, new ArrayList<>());
         DataStore.readings.get(sensorId).add(reading);
 
-        // 🔥 IMPORTANT: update sensor current value
+         
         Sensor sensor = DataStore.sensors.get(sensorId);
         sensor.setCurrentValue(reading.getValue());
 

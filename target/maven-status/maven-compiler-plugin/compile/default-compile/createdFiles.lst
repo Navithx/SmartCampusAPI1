@@ -11,3 +11,4 @@ com/smartcampus/exception/NotFoundMapper.class
 com/smartcampus/model/SensorReading.class
 com/smartcampus/resource/SensorReadingResource.class
 com/smartcampus/exception/GenericExceptionMapper.class
+com/smartcampus/resource/RootResource.class
