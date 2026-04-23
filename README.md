@@ -32,8 +32,6 @@ Make sure you have installed:
 Java JDK 17+
 Maven
 
----
-
 Step-by-Step Instructions
 
 1. Clone the repository
@@ -114,6 +112,6 @@ Logging
 
 A logging filter is implemented to:
 
-Log incoming requests
-Log outgoing responses
-Improve debugging and observability
+ Log incoming requests
+ Log outgoing responses
+ Improve debugging and observability
