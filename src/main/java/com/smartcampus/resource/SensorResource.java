@@ -56,6 +56,21 @@ public class SensorResource {
         return Response.status(201).entity(sensor).build();
     }
     
+    @GET
+    @Path("/{id}")
+    public Response getSensorById(@PathParam("id") String id) {
+
+        Sensor sensor = DataStore.sensors.get(id);
+
+        if (sensor == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("{\"error\":\"Resource not found\"}")
+                    .build();
+        }
+
+        return Response.ok(sensor).build();
+    }
+    
     @Path("/{id}/readings")
     public SensorReadingResource getReadingResource() {
     return new SensorReadingResource();
